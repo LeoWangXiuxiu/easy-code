@@ -1,4 +1,4 @@
-package constant;
+package cc.constant;
 
 import lombok.AllArgsConstructor;
 

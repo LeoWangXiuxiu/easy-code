@@ -1,4 +1,4 @@
-package util;//package cc.util;
+package cc.util;//package cc.util;
 //
 //import lombok.extern.slf4j.Slf4j;
 //import org.springframework.amqp.rabbit.annotation.RabbitListener;

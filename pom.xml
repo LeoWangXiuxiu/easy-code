@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>github.Wangxiuxiu</groupId>
-    <artifactId>easy-code</artifactId>
+    <groupId>github.LeoWangxiuxiu</groupId>
+    <artifactId>EasyCode</artifactId>
     <version>1.0.0</version>
 
     <properties>
@@ -16,19 +16,18 @@
         <github.global.server>github</github.global.server>
     </properties>
 
+
     <dependencies>
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
             <version>5.5.7</version>
         </dependency>
-        <!-- pdf转换-->
         <dependency>
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>pdfbox</artifactId>
             <version>2.0.27</version>
         </dependency>
-        <!-- 处理word https://github.com/Sayi/poi-tl -->
         <dependency>
             <groupId>com.deepoove</groupId>
             <artifactId>poi-tl</artifactId>
@@ -39,6 +38,11 @@
             <artifactId>lombok</artifactId>
             <version>1.18.20</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>knife4j-spring-boot-starter</artifactId>
+            <version>3.0.3</version>
         </dependency>
     </dependencies>
 
@@ -53,7 +57,6 @@
                 </configuration>
             </plugin>
 
-            <!--源碼-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
@@ -68,7 +71,6 @@
                 </executions>
             </plugin>
 
-            <!--github上傳插件,用於修改後的發佈,執行 mvn clean deploy 自動打包上傳到github-->
             <plugin>
                 <groupId>com.github.github</groupId>
                 <artifactId>site-maven-plugin</artifactId>
@@ -76,19 +78,15 @@
                 <configuration>
                     <message >Maven artifacts for ${project.version}</message>
                     <noJekyll>true</noJekyll>
-                    <!--本地jar地址-->
                     <outputDirectory>${project.build.directory}/repository</outputDirectory>
-                    <!--分支-->
                     <branch>refs/heads/master</branch>
                     <merge>true</merge>
 
                     <includes>
                         <include>**/*</include>
                     </includes>
-                    <!--對應github上建立的倉庫名稱 name-->
-                    <repositoryName>maven-repo-demo</repositoryName>
-                    <!--github 倉庫全部者 不是帳號-->
-                    <repositoryOwner>l305170891</repositoryOwner>
+                    <repositoryName>easy-code</repositoryName>
+                    <repositoryOwner>LeoWangxiuxiu</repositoryOwner>
                 </configuration>
 
                 <executions>

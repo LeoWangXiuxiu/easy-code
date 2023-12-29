@@ -1,8 +1,8 @@
-package util;
+package cc.util;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
-import constant.TimeType;
+import cc.constant.TimeType;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;

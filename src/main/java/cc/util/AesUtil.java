@@ -1,4 +1,4 @@
-package util;
+package cc.util;
 
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;

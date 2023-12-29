@@ -1,4 +1,4 @@
-package util;
+package cc.util;
 
 import java.math.BigDecimal;
 
