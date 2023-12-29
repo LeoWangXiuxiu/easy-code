@@ -1,11 +1,15 @@
 package cc.config;
 
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+
+@Component
+@ConfigurationProperties(prefix = "spring.datasource")
 public class PgConfig {
     private String driverClassName;
     private String url;
     private String username;
     private String password;
-    private String absolutePath;
 
     public String getDriverClassName() {
         return driverClassName;
@@ -39,11 +43,4 @@ public class PgConfig {
         this.password = password;
     }
 
-    public String getAbsolutePath() {
-        return absolutePath;
-    }
-
-    public void setAbsolutePath(String absolutePath) {
-        this.absolutePath = absolutePath;
-    }
 }

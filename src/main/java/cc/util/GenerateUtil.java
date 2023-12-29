@@ -3,7 +3,11 @@ package cc.util;
 import cc.config.PgConfig;
 import cc.dto.ColumnDto;
 import cc.dto.TableInfo;
+import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -14,42 +18,118 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
+@AllArgsConstructor(onConstructor_ = @Autowired)
 public class GenerateUtil {
+    private final PgConfig pgConfig;
 
+    public static void main(String[] args) {
+        System.out.println(getAbsolutePath("controller"));
+        System.out.println(getAbsolutePath("util"));
+        System.out.println(getAbsolutePath("dto"));
+    }
 
-    public void generateEntity(PgConfig pgConfig, String tableName) throws IOException {
-        List<TableInfo> tableInformationList = getTableInformation(pgConfig);
+    public static String getAbsolutePath(String module) {
+        String currentDir = System.getProperty("user.dir");
+        return printDirectoryContents(null, new File(currentDir), module);
+    }
+
+    public static String printDirectoryContents(String res, File dir, String module) {
+        File[] files = dir.listFiles();
+        for (File file : files) {
+            if (file.isDirectory()) {
+                if (file.getName().equals(module)) {
+                    res = file.getAbsolutePath();
+                    return res;
+                }
+                res = printDirectoryContents(res, file, module);
+            }
+        }
+        return res;
+    }
+
+    public void generateEntity(String module, String tableName, String pre) throws IOException {
+        List<TableInfo> tableInformationList = getTableInformation(pgConfig, pre);
         for (TableInfo t : tableInformationList) {
             try {
                 if (!t.getTableName().equals(tableName)) {
                     continue;
                 }
-                markerBean(pgConfig.getAbsolutePath(), t.getClassName(), "entity", getEntityInfo(t));
+                markerBean(getAbsolutePath(module), t.getClassName(), getEntityInfo(t));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
     }
 
-    public void generateMapperAndService(PgConfig pgConfig, String tableName) throws IOException {
-        List<TableInfo> tableInformationList = getTableInformation(pgConfig);
+    public void generateMapper(String module, String tableName, String pre) throws IOException {
+        List<TableInfo> tableInformationList = getTableInformation(pgConfig, pre);
         for (TableInfo t : tableInformationList) {
             try {
                 if (!t.getTableName().equals(tableName)) {
                     continue;
                 }
-                //生成实体类
-                markerBean(pgConfig.getAbsolutePath(), t.getClassName(), "entity", getEntityInfo(t));
+                markerBean(getAbsolutePath(module), t.getClassName() + "Mapper", getMapper(t));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public void generateService(String module, String tableName, String pre) throws IOException {
+        List<TableInfo> tableInformationList = getTableInformation(pgConfig, pre);
+        for (TableInfo t : tableInformationList) {
+            try {
+                if (!t.getTableName().equals(tableName)) {
+                    continue;
+                }
+                markerBean(getAbsolutePath(module), "I" + t.getClassName() + "Service", getService(t));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public void generateServiceImpl(String module, String tableName, String pre) throws IOException {
+        List<TableInfo> tableInformationList = getTableInformation(pgConfig, pre);
+        for (TableInfo t : tableInformationList) {
+            try {
+                if (!t.getTableName().equals(tableName)) {
+                    continue;
+                }
+                markerBean(getAbsolutePath(module), t.getClassName() + "ServiceImpl", getServiceImpl(t));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public void generateXml(String module, String tableName, String pre) throws IOException {
+        List<TableInfo> tableInformationList = getTableInformation(pgConfig, pre);
+        for (TableInfo t : tableInformationList) {
+            try {
+                if (!t.getTableName().equals(tableName)) {
+                    continue;
+                }
+                markerXml(getAbsolutePath(module), t.getClassName() + "Mapper", getXml(t));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public void generateMapperAndService(String tableName, String pre) throws IOException {
+        List<TableInfo> tableInformationList = getTableInformation(pgConfig, pre);
+        for (TableInfo t : tableInformationList) {
+            try {
+                if (!t.getTableName().equals(tableName)) {
+                    continue;
+                }
                 //生成Mapper类
-                markerBean(pgConfig.getAbsolutePath(), t.getClassName() + "Mapper", "mapper", getMapper(t));
+                markerBean(getAbsolutePath("mapper"), t.getClassName() + "Mapper", getMapper(t));
                 //生成Service类
-                markerBean(pgConfig.getAbsolutePath(), "I" + t.getClassName() + "Service", "service", getService(t));
+                markerBean(getAbsolutePath("service"), "I" + t.getClassName() + "Service", getService(t));
                 //生成ServiceImpl类
-                markerBean(pgConfig.getAbsolutePath(), t.getClassName() + "ServiceImpl", "service/Impl", getServiceImpl(t));
-                //生成Controller类
-                markerBean(pgConfig.getAbsolutePath(), t.getClassName() + "Controller", "controller", getController(t));
-                //生成xml
-                markerXml(pgConfig.getAbsolutePath(), t.getClassName() + "Mapper", getXml(t));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -57,22 +137,22 @@ public class GenerateUtil {
     }
 
     //    "/Users/wangxiuxiu/ideaProject/wang-xiuxius-private-warehouse"
-    public void generateAll(PgConfig pgConfig, String path) {
-        List<TableInfo> tableInformationList = getTableInformation(pgConfig);
+    public void generateAll(String pre) {
+        List<TableInfo> tableInformationList = getTableInformation(pgConfig, pre);
         for (TableInfo t : tableInformationList) {
             try {
                 //生成实体类
-                markerBean(path, t.getClassName(), "entity", getEntityInfo(t));
+                markerBean(getAbsolutePath("entity"), t.getClassName(), getEntityInfo(t));
                 //生成Mapper类
-                markerBean(path, t.getClassName() + "Mapper", "mapper", getMapper(t));
+                markerBean(getAbsolutePath("mapper"), t.getClassName() + "Mapper", getMapper(t));
                 //生成Service类
-                markerBean(path, "I" + t.getClassName() + "Service", "service", getService(t));
+                markerBean(getAbsolutePath("service"), "I" + t.getClassName() + "Service", getService(t));
                 //生成ServiceImpl类
-                markerBean(path, t.getClassName() + "ServiceImpl", "service/Impl", getServiceImpl(t));
+                markerBean(getAbsolutePath("Impl"), t.getClassName() + "ServiceImpl", getServiceImpl(t));
                 //生成Controller类
-                markerBean(path, t.getClassName() + "Controller", "controller", getController(t));
+                markerBean(getAbsolutePath("controller"), t.getClassName() + "Controller", getController(t));
                 //生成xml
-                markerXml(path, t.getClassName() + "Mapper", getXml(t));
+                markerXml(getAbsolutePath("xml"), t.getClassName() + "Mapper", getXml(t));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -275,7 +355,7 @@ public class GenerateUtil {
         return null;
     }
 
-    private List<TableInfo> getTableInformation(PgConfig pgConfig) {
+    private List<TableInfo> getTableInformation(PgConfig pgConfig, String pre) {
         Connection conn = null;
         try {
             List<TableInfo> tableInfoList = new ArrayList<>();
@@ -294,7 +374,7 @@ public class GenerateUtil {
                 System.out.println("\t" + tableName);
                 TableInfo info = new TableInfo();
                 info.setTableName(tableName);
-                info.setClassName(toCamelCase(tableName.replace("t_", ""), true));
+                info.setClassName(toCamelCase(tableName.replace(pre, ""), true));
                 // Get a list of all columns in the table
                 ResultSet rsColumns = meta.getColumns(null, null, tableName, null);
                 System.out.println("\t\tColumns:");
@@ -360,9 +440,8 @@ public class GenerateUtil {
      * @param className 类名
      * @param content   添加的内容(字段注释等)
      */
-    public static void markerBean(String path, String className, String module, String content) throws IOException {
-        path += "/src/main/java/cc/";
-        FileWriter fw = new FileWriter(path + module + "/" + className + ".java");
+    public static void markerBean(String path, String className, String content) throws IOException {
+        FileWriter fw = new FileWriter(path + "/" + className + ".java");
         PrintWriter pw = new PrintWriter(fw);
         pw.println(content);
         pw.flush();
@@ -370,7 +449,6 @@ public class GenerateUtil {
     }
 
     public static void markerXml(String path, String name, String content) throws IOException {
-        path += "/src/main/resources/mapper/";
         FileWriter fw = new FileWriter(path + "/" + name + ".xml");
         PrintWriter pw = new PrintWriter(fw);
         pw.println(content);
