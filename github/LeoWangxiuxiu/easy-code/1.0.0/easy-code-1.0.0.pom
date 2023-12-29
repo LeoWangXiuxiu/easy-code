@@ -16,6 +16,7 @@
         <github.global.server>github</github.global.server>
     </properties>
 
+
     <dependencies>
         <dependency>
             <groupId>cn.hutool</groupId>
@@ -53,7 +54,6 @@
                 </configuration>
             </plugin>
 
-            <!--源碼-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
@@ -68,7 +68,6 @@
                 </executions>
             </plugin>
 
-            <!--github上傳插件,用於修改後的發佈,執行 mvn clean deploy 自動打包上傳到github-->
             <plugin>
                 <groupId>com.github.github</groupId>
                 <artifactId>site-maven-plugin</artifactId>
@@ -76,18 +75,14 @@
                 <configuration>
                     <message >Maven artifacts for ${project.version}</message>
                     <noJekyll>true</noJekyll>
-                    <!--本地jar地址-->
                     <outputDirectory>${project.build.directory}/repository</outputDirectory>
-                    <!--分支-->
                     <branch>refs/heads/master</branch>
                     <merge>true</merge>
 
                     <includes>
                         <include>**/*</include>
                     </includes>
-                    <!--對應github上建立的倉庫名稱 name-->
                     <repositoryName>easy-code</repositoryName>
-                    <!--github 倉庫全部者 不是帳號-->
                     <repositoryOwner>LeoWangxiuxiu</repositoryOwner>
                 </configuration>
 
